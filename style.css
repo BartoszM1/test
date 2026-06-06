@@ -441,55 +441,115 @@ body {
     .info-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 12px 12px 12px; }
 }
 
+/* 📱 SFINALIZOWANY, ELIMINUJĄCY PROBLEM UKŁAD MOBILNY 📱 */
 @media (max-width: 480px) {
     body { 
         padding: 0; 
-        overflow-y: auto !important; /* Włączenie globalnego scrolla strony na telefonach */
+        overflow-y: auto !important; 
     }
 
-    /* MATRYCA WYSOKOŚCI DLA KONTENERA NA SMARTFONACH */
+    /* Stan wyjściowy: Swobodny układ (porady są na dole ekranu) */
     .container {
+        width: 100%;
         max-width: 100%;
         border-radius: 0;
         height: auto !important;
         max-height: none !important;
+        display: flex;
+        flex-direction: column;
         overflow: visible !important;
+        transition: transform 0.3s ease;
     }
 
-    .header { padding: 15px 10px; gap: 8px; flex-direction: column; text-align: center; }
-    .header-controls { width: 100%; justify-content: center; }
-    .chat-container { padding: 10px; gap: 8px; }
-    .chat-header { padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
-    
-    /* Blokujemy rozciąganie się samego okna czatu w nieskończoność */
-    .chat-box { 
-        min-height: 250px; 
-        max-height: 400px; 
-        overflow-y: auto; 
-        padding: 8px; 
-        gap: 6px; 
+    /* Stan aktywny (Po wysłaniu wiadomości): Czat staje się bezwzględnym panem ekranu */
+    .container.chat-expanded {
+        height: 100vh !important;
+        max-height: 100vh !important;
+        overflow: hidden !important; /* Blokuje przewijanie całej strony dopóki jesteś na górze */
+    }
+
+    .header { 
+        padding: 12px 10px; 
+        gap: 5px; 
+        flex-direction: column; 
+        text-align: center; 
     }
     
-    .message-content { font-size: 0.85rem; padding: 8px 10px; }
+    .header-content h1 { font-size: 1.3rem; }
+    .header-controls { width: 100%; justify-content: center; gap: 12px; }
+
+    /* Sekcja główna - to tutaj zarządzamy wypychaniem elementów */
+    .main-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto !important;
+        overflow-x: hidden;
+    }
+
+    /* Kontener czatu na start */
+    .chat-container { 
+        padding: 10px; 
+        gap: 8px; 
+        height: auto !important;
+        min-height: 340px;
+        flex-shrink: 0;
+    }
+    
+    /* POPRAWKA: Po rozszerzeniu, wymuszamy na oknie czatu zajęcie DOKŁADNIE 100% dostępnej wysokości pod nagłówkiem */
+    .container.chat-expanded .chat-container {
+        height: 100% !important;
+        flex: 1 0 100% !important; /* Blokuje podchodzenie czegokolwiek z dołu */
+    }
+
+    .chat-header { padding-bottom: 6px; border-bottom: 1px solid var(--border-color); }
+    .header-title h2 { font-size: 1rem; }
+
+    .chat-box { 
+        flex: none;
+        height: auto !important;
+        min-height: 200px;
+        padding: 8px; 
+        gap: 8px; 
+    }
+    
+    /* Po rozszerzeniu, okno dymków otrzymuje pełną przestrzeń i własny suwak */
+    .container.chat-expanded .chat-box {
+        flex: 1 !important;
+        height: 100% !important;
+        overflow-y: auto !important;
+    }
+    
+    .message-content { font-size: 0.88rem; padding: 9px 12px; }
     .chat-input-section { padding-top: 8px; border-top: 1px solid var(--border-color); }
-    .chat-input { padding: 10px 10px; font-size: 16px; min-height: 40px; border-radius: 6px; }
+    .chat-input { padding: 10px; font-size: 16px; min-height: 42px; border-radius: 6px; }
     
-    .send-button { padding: 10px 12px; min-height: 40px; border-radius: 6px; }
-    .send-button span:first-child { display: none; } /* Ukrywa napis "Wyślij", zostaje sama strzałka */
+    .send-button { padding: 10px 14px; min-height: 42px; border-radius: 6px; }
+    .send-button span:first-child { display: none; } 
     
-    /* UKŁAD PANELU PORAD NA SAMYM DOLE */
+    /* POPRAWKA PANELU PORAD: Po włączeniu .chat-expanded dostaje potężny margines i zostaje całkowicie wyrzucony poza krawędź ekranu */
     .info-panel {
         display: flex !important;
         flex-direction: column;
-        gap: 8px;
-        padding: 10px;
+        gap: 10px;
+        padding: 25px 10px;
+        background: var(--bg-secondary);
+        border-top: 2px dashed var(--border-color);
         height: auto !important;
-        overflow: visible !important;
+        flex-shrink: 0; 
+    }
+    
+    .container.chat-expanded .info-panel {
+        margin-top: 40px; /* Dodatkowy dystans od dołu okna czatu */
+    }
+
+    .info-card {
+        background: var(--bg-light);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 }
 
 @media (max-width: 360px) {
-    .header-content h1 { font-size: 1.1rem; }
-    .chat-container { padding: 8px; gap: 6px; }
-    .message-content { font-size: 0.8rem; padding: 7px 9px; }
+    .chat-container { padding: 6px; }
+    .message-content { font-size: 0.85rem; }
 }
