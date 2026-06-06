@@ -4,6 +4,7 @@ const chatBox = document.getElementById('chat-box');
 const darkModeBtn = document.getElementById('dark-mode-btn');
 const clearHistoryBtn = document.getElementById('clear-history-btn');
 const exportHistoryBtn = document.getElementById('export-history-btn');
+const mainContainer = document.querySelector('.container');
 
 // --- KONFIGURACJA API POGODOWEGO ---
 const API_KEY = '90037b458f941500ae305607ac1a392c';
@@ -57,12 +58,15 @@ async function sendMessage() {
     isWaitingForResponse = true;
     sendBtn.disabled = true;
     
+    if (mainContainer) {
+        mainContainer.classList.add('chat-expanded');
+    }
+    
     addMessage(userText, 'user-message');
     userInput.value = '';
     
     showTypingIndicator();
 
-    // Pobranie odpowiedzi z unifikowanej funkcji hybrydowej
     const response = await getBotResponse(userText);
     
     removeTypingIndicator();
@@ -88,22 +92,12 @@ function addMessage(message, sender) {
     scrollToBottom();
 }
 
-// --- POPRAWIONA I ZBUDOWANA AUTOMATYZACJA SCROLLOWANIA NA MOBILE ---
 function scrollToBottom() {
     setTimeout(() => {
-        // 1. Wewnętrzny scroll samego kontenera czatu (desktop/tablety)
         if (chatBox) {
             chatBox.scrollTop = chatBox.scrollHeight;
         }
-        
-        // 2. NOWOŚĆ: Automatyczny scroll całego ekranu smartfona w dół
-        if (window.innerWidth <= 768) {
-            window.scrollTo({
-                top: document.body.scrollHeight,
-                behavior: 'smooth' // Płynny, animowany zjazd w dół
-            });
-        }
-    }, 100);
+    }, 50);
 }
 
 function showTypingIndicator() {
@@ -131,17 +125,14 @@ function removeTypingIndicator() {
     }
 }
 
-// Główny mózg bota: decyduje, czy obsłużyć tekst ręcznie, czy odpytać API OpenWeatherMap
 async function getBotResponse(userInput) {
     const lowerInput = userInput.toLowerCase();
 
-    // 1. Obsługa zwrotów grzecznościowych
     const defaultReply = handleDefaultResponse(lowerInput);
     if (defaultReply) {
         return defaultReply;
     }
 
-    // 2. Sprawdzenie, czy użytkownik podał parametry pogodowe słownie
     const hasNumbers = /\d+/.test(userInput);
     const hasWeatherKeywords = lowerInput.includes('stopn') || lowerInput.includes('stopie') || 
                                lowerInput.includes('ciepło') || lowerInput.includes('zimno') || 
@@ -154,7 +145,6 @@ async function getBotResponse(userInput) {
         return processLocalWeatherDescription(lowerInput);
     }
 
-    // 3. Traktujemy wpis jako miasto i uderzamy do API
     const cityName = userInput.replace(/(pogoda w|pogoda|w|sprawdź|miasto)/gi, '').trim();
 
     if (cityName.length < 2) {
@@ -178,7 +168,7 @@ async function getBotResponse(userInput) {
         const temp = data.main.temp;
         const weatherDescription = data.weather[0].description;
         const weatherMain = data.weather[0].main.toLowerCase();
-        const windSpeed = data.wind.speed * 3.6; // m/s -> km/h
+        const windSpeed = data.wind.speed * 3.6;
 
         const mappedTemp = mapTemperature(temp);
         const mappedWeather = mapWeatherCondition(weatherMain);
@@ -196,13 +186,11 @@ async function getBotResponse(userInput) {
     }
 }
 
-// Analiza wyrażeń słownych
 function processLocalWeatherDescription(lowerInput) {
     let detectedTempCategory = 'neutralnie';
     let detectedWeatherCategory = null;
     let isWindy = lowerInput.includes('wiatr') || lowerInput.includes('wieje') || lowerInput.includes('mocno');
 
-    // Wyciąganie stopni z tekstu
     const tempMatch = lowerInput.match(/(-?\d+)\s*(deg|stop|°|\s|$)/);
     if (tempMatch && !isNaN(parseInt(tempMatch[1])) && lowerInput.includes('stop')) {
         const tempValue = parseInt(tempMatch[1]);
@@ -214,7 +202,6 @@ function processLocalWeatherDescription(lowerInput) {
         else if (lowerInput.includes('gorąco') || lowerInput.includes('upał') || lowerInput.includes('30°')) detectedTempCategory = 'gorąco';
     }
 
-    // Wykrywanie dodatków pogodowych
     if (lowerInput.includes('deszcz') || lowerInput.includes('pada') || lowerInput.includes('mokro')) detectedWeatherCategory = 'deszcz';
     else if (lowerInput.includes('śnieg') || lowerInput.includes('sypie')) detectedWeatherCategory = 'śnieg';
     else if (lowerInput.includes('słońce') || lowerInput.includes('słonecz')) detectedWeatherCategory = 'słońce';
@@ -249,7 +236,7 @@ function generateClothingRecommendation(temperature, weather, isWindy) {
         case 'zimno':
             recommendation += '❄️ **WARUNKI: Bardzo zimno**\n';
             recommendation += '• Kurtka zimowa lub puchowa parka\n';
-            recommendation += '• Ciepłe spodnie (np. jeansy, grube legginsy)\n';
+            recommendation += '• Ciepłe spodnie (np. jeansy)\n';
             recommendation += '• Gruby sweter lub polar\n';
             recommendation += '• Czapka, szalik i rękawiczki\n';
             recommendation += '• Zimowe buty z izolacją\n\n';
@@ -259,7 +246,7 @@ function generateClothingRecommendation(temperature, weather, isWindy) {
             recommendation += '• Kurtka przejściowa (bomberka, softshell)\n';
             recommendation += '• Długie spodnie\n';
             recommendation += '• Lekki sweter lub bluza z kapturem\n';
-            recommendation += '• Zamknięte buty sportowe / botki\n\n';
+            recommendation += '• Zamknięte buty sportowe\n\n';
             break;
         case 'neutralnie':
             recommendation += '😊 **WARUNKI: Umiarkowana pogoda**\n';
@@ -269,20 +256,20 @@ function generateClothingRecommendation(temperature, weather, isWindy) {
             break;
         case 'ciepło':
             recommendation += '☀️ **WARUNKI: Ciepło**\n';
-            recommendation += '• Krótkie spodenki, szorty lub spódnica\n';
+            recommendation += '• Krótkie spodenki lub spódnica\n';
             recommendation += '• Koszulka z krótkim rękawem / top\n';
             recommendation += '• Trampki lub sandały\n\n';
             break;
         case 'gorąco':
             recommendation += '🌡️ **WARUNKI: Upał**\n';
-            recommendation += '• Luźne ubrania z przewiewnego materiału (len/bawełna)\n';
+            recommendation += '• Luźne ubrania z przewiewnego materiału\n';
             recommendation += '• Koszulka na ramiączkach\n';
             recommendation += '• Sandały lub lekkie klapki\n\n';
             break;
     }
     
     if (isWindy && temperature !== 'gorąco') {
-        recommendation += '💨 **⚠️ UWAGA:** Wieje silniejszy wiatr. Przydatna okaże się bluza z kapturem lub wiatrówka!\n\n';
+        recommendation += '💨 **⚠️ UWAGA:** Wieje silniejszy wiatr. Przydatna okaże się bluza z kapturem!\n\n';
     }
     
     if (weather) {
@@ -297,10 +284,10 @@ function generateClothingRecommendation(temperature, weather, isWindy) {
                 recommendation += '🌞 **DODATKI NA SŁOŃCE:**\n• Okulary przeciwsłoneczne UV\n• Krem ochronny z filtrem SPF\n';
                 break;
             case 'burza':
-                recommendation += '⚡ **DODATKI NA BURZĘ:**\n• Kurtka z kapturem\n• Jeśli możesz, pozostań w bezpiecznym pomieszczeniu!\n';
+                recommendation += '⚡ **DODATKI NA BURZĘ:**\n• Kurtka z kapturem\n• Pozostań w bezpiecznym pomieszczeniu!\n';
                 break;
             case 'mgła':
-                recommendation += '🌫️ **DODATKI NA MGŁĘ:**\n• Elementy odblaskowe lub jasna odzież zapewniająca widoczność\n';
+                recommendation += '🌫️ **DODATKI NA MGŁĘ:**\n• Elementy odblaskowe zwiększające widoczność\n';
                 break;
         }
     }
@@ -332,8 +319,11 @@ function saveChatHistory(userMessage, botResponse) {
 
 function loadChatHistory() {
     const saved = localStorage.getItem('chatHistory');
-    if (saved) {
+    if (saved) { 
         chatHistory = JSON.parse(saved);
+        if (chatHistory.length > 0 && mainContainer) {
+            mainContainer.classList.add('chat-expanded');
+        }
     }
 }
 
@@ -341,6 +331,9 @@ function clearChatHistory() {
     if (chatHistory.length === 0) { alert('Historia rozmów jest pusta!'); return; }
     if (confirm('Czy na pewno chcesz usunąć całą historię rozmów?')) {
         chatHistory = []; localStorage.removeItem('chatHistory'); chatBox.innerHTML = '';
+        if (mainContainer) {
+            mainContainer.classList.remove('chat-expanded');
+        }
         const welcomeMessage = document.createElement('div');
         welcomeMessage.classList.add('welcome-message');
         welcomeMessage.innerHTML = `<h3>Witaj ponownie! 👋</h3><p>Historia rozmów została wyczyszczona. Możemy zacząć od nowa!</p>`;
