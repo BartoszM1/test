@@ -5,6 +5,8 @@ const darkModeBtn = document.getElementById('dark-mode-btn');
 const clearHistoryBtn = document.getElementById('clear-history-btn');
 const exportHistoryBtn = document.getElementById('export-history-btn');
 const mainContainer = document.querySelector('.container');
+// Pobranie kontenera czatu do celów automatycznego pozycjonowania ekranu
+const chatContainerElement = document.querySelector('.chat-container');
 
 // --- KONFIGURACJA API POGODOWEGO ---
 const API_KEY = '90037b458f941500ae305607ac1a392c';
@@ -48,6 +50,15 @@ function updateDarkModeIcon() {
     darkModeBtn.innerHTML = `<span class="btn-icon">${isDarkMode ? '☀️' : '🌙'}</span>`;
 }
 
+// NOWOŚĆ: Funkcja wymuszająca automatyczne wycentrowanie ekranu mobilnego na oknie czatu
+function autoScrollToChat() {
+    if (window.innerWidth <= 480 && chatContainerElement) {
+        setTimeout(() => {
+            chatContainerElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    }
+}
+
 async function sendMessage() {
     const userText = userInput.value.trim();
     
@@ -58,9 +69,11 @@ async function sendMessage() {
     isWaitingForResponse = true;
     sendBtn.disabled = true;
     
+    // Aktywacja trybu pełnoekranowego i automatyczne pozycjonowanie widoku
     if (mainContainer) {
         mainContainer.classList.add('chat-expanded');
     }
+    autoScrollToChat();
     
     addMessage(userText, 'user-message');
     userInput.value = '';
@@ -74,7 +87,9 @@ async function sendMessage() {
     
     isWaitingForResponse = false;
     sendBtn.disabled = false;
+    
     scrollToBottom();
+    autoScrollToChat(); // Ponowne upewnienie się, że po nadejściu długiej odpowiedzi ekran nie uciekł
     userInput.focus();
     
     saveChatHistory(userText, response);
@@ -212,6 +227,7 @@ function processLocalWeatherDescription(lowerInput) {
     return localHeader + generateClothingRecommendation(detectedTempCategory, detectedWeatherCategory, isWindy);
 }
 
+// Mapowanie temperatury
 function mapTemperature(temp) {
     if (temp <= 5) return 'zimno';
     if (temp > 5 && temp <= 12) return 'chłodno';
@@ -220,6 +236,7 @@ function mapTemperature(temp) {
     return 'gorąco';
 }
 
+// Mapowanie warunków pogodowych
 function mapWeatherCondition(mainCondition) {
     if (mainCondition.includes('rain') || mainCondition.includes('drizzle')) return 'deszcz';
     if (mainCondition.includes('snow')) return 'śnieg';
@@ -323,6 +340,7 @@ function loadChatHistory() {
         chatHistory = JSON.parse(saved);
         if (chatHistory.length > 0 && mainContainer) {
             mainContainer.classList.add('chat-expanded');
+            autoScrollToChat();
         }
     }
 }
