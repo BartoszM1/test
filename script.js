@@ -5,6 +5,7 @@ const darkModeBtn = document.getElementById('dark-mode-btn');
 const clearHistoryBtn = document.getElementById('clear-history-btn');
 const exportHistoryBtn = document.getElementById('export-history-btn');
 
+// --- KONFIGURACJA API POGODOWEGO ---
 const API_KEY = '90037b458f941500ae305607ac1a392c';
 
 let isWaitingForResponse = false;
