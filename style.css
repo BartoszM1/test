@@ -441,14 +441,15 @@ body {
     .info-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 12px 12px 12px; }
 }
 
-/* 📱 SFINALIZOWANY, ELIMINUJĄCY PROBLEM UKŁAD MOBILNY 📱 */
+/* 📱 AUTOMATYCZNY I ULTRAPRECYZYJNY UKŁAD MOBILNY 📱 */
 @media (max-width: 480px) {
     body { 
         padding: 0; 
         overflow-y: auto !important; 
+        scroll-behavior: smooth; /* Płynne przewijanie widoku aktywowane przez skrypt */
     }
 
-    /* Stan wyjściowy: Swobodny układ (porady są na dole ekranu) */
+    /* Stan początkowy - porady widoczne tuż pod małym oknem wpisywania */
     .container {
         width: 100%;
         max-width: 100%;
@@ -458,14 +459,13 @@ body {
         display: flex;
         flex-direction: column;
         overflow: visible !important;
-        transition: transform 0.3s ease;
     }
 
-    /* Stan aktywny (Po wysłaniu wiadomości): Czat staje się bezwzględnym panem ekranu */
+    /* AUTOMATYKA: Gdy czat zostaje wywołany, kontener rozszerza się sztywno do całego widoku smartfona */
     .container.chat-expanded {
         height: 100vh !important;
         max-height: 100vh !important;
-        overflow: hidden !important; /* Blokuje przewijanie całej strony dopóki jesteś na górze */
+        overflow: hidden !important; 
     }
 
     .header { 
@@ -478,7 +478,6 @@ body {
     .header-content h1 { font-size: 1.3rem; }
     .header-controls { width: 100%; justify-content: center; gap: 12px; }
 
-    /* Sekcja główna - to tutaj zarządzamy wypychaniem elementów */
     .main-section {
         flex: 1;
         display: flex;
@@ -487,19 +486,19 @@ body {
         overflow-x: hidden;
     }
 
-    /* Kontener czatu na start */
+    /* Okienko czatu na samym początku */
     .chat-container { 
         padding: 10px; 
         gap: 8px; 
         height: auto !important;
-        min-height: 340px;
+        min-height: 300px;
         flex-shrink: 0;
     }
     
-    /* POPRAWKA: Po rozszerzeniu, wymuszamy na oknie czatu zajęcie DOKŁADNIE 100% dostępnej wysokości pod nagłówkiem */
+    /* AUTOMATYKA: Wymuszenie zajęcia PEŁNYCH 100% wysokości ekranu pod nagłówkiem */
     .container.chat-expanded .chat-container {
-        height: 100% !important;
-        flex: 1 0 100% !important; /* Blokuje podchodzenie czegokolwiek z dołu */
+        height: calc(100vh - 110px) !important;
+        flex: 1 0 calc(100vh - 110px) !important; /* Blokuje podjeżdżanie jakichkolwiek elementów z dołu */
     }
 
     .chat-header { padding-bottom: 6px; border-bottom: 1px solid var(--border-color); }
@@ -508,12 +507,12 @@ body {
     .chat-box { 
         flex: none;
         height: auto !important;
-        min-height: 200px;
+        min-height: 180px;
         padding: 8px; 
         gap: 8px; 
     }
     
-    /* Po rozszerzeniu, okno dymków otrzymuje pełną przestrzeń i własny suwak */
+    /* Wewnętrzny scroll dla dymków wiadomości w trybie pełnoekranowym */
     .container.chat-expanded .chat-box {
         flex: 1 !important;
         height: 100% !important;
@@ -527,7 +526,7 @@ body {
     .send-button { padding: 10px 14px; min-height: 42px; border-radius: 6px; }
     .send-button span:first-child { display: none; } 
     
-    /* POPRAWKA PANELU PORAD: Po włączeniu .chat-expanded dostaje potężny margines i zostaje całkowicie wyrzucony poza krawędź ekranu */
+    /* Panel porad - zrzucany głęboko poniżej widocznego obszaru startowego */
     .info-panel {
         display: flex !important;
         flex-direction: column;
@@ -539,8 +538,9 @@ body {
         flex-shrink: 0; 
     }
     
+    /* Dodatkowe zabezpieczenie dystansu w trybie pełnym */
     .container.chat-expanded .info-panel {
-        margin-top: 40px; /* Dodatkowy dystans od dołu okna czatu */
+        margin-top: 50px; 
     }
 
     .info-card {
