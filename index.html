@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Fashion Assistant - Bot doradzający ubiór do pogody</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1>👕 Weather Fashion Assistant</h1>
+                <p>Inteligentny bot doradzający ubiór do pogody</p>
+            </div>
+            <div class="header-controls">
+                <button class="control-btn" id="dark-mode-btn" title="Tryb ciemny">
+                    <span class="btn-icon">🌙</span>
+                </button>
+                <button class="control-btn" id="clear-history-btn" title="Wyczyść historię">
+                    <span class="btn-icon">🗑️</span>
+                </button>
+                <button class="control-btn" id="export-history-btn" title="Exportuj historię">
+                    <span class="btn-icon">📥</span>
+                </button>
+            </div>
+        </header>
+        <main class="main-section">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="header-title">
+                        <span class="status-icon">🟢</span>
+                        <h2>Weather AI Assistant</h2>
+                    </div>
+                    <p class="header-subtitle">Pomogę Ci wybrać idealny strój do dzisiejszej pogody</p>
+                </div>
+                <div class="chat-box" id="chat-box">
+                    <div class="welcome-message">
+                        <h3>Witaj! 👋</h3>
+                        <p>Jestem Twoim asystentem!<p>
+                        <p>Napisz nazwę miasta lub opisz warunki pogodowe, a ja zasugeruję Ci idealny strój!</p>
+                        <p class="hint">💡 Napisz np: "Poznań", "Londyn" lub "15 stopni i pada deszcz"</p>
+                    </div>
+                </div>
+                <div class="chat-input-section">
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="user-input" 
+                            class="chat-input" 
+                            placeholder="Wpisz miasto lub opisz pogodę..."
+                            autocomplete="off"
+                        >
+                        <button class="send-button" id="send-btn">
+                            <span>Wyślij</span>
+                            <span class="send-icon">➤</span>
+                        </button>
+                    </div>
+                    <p class="input-hint">Naciśnij Enter lub kliknij przycisk Wyślij</p>
+                </div>
+            </div>
+            <aside class="info-panel">
+                <div class="info-card">
+                    <h3>💡 Porady</h3>
+                    <ul>
+                        <li>Podaj miasto lub temperaturę</li>
+                        <li>Opisz warunki pogodowe</li>
+                        <li>Wspomnij o wietrze</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>👕 Co mogę zasugerować</h3>
+                    <ul>
+                        <li>Odpowiednią odzież</li>
+                        <li>Niezbędne dodatki</li>
+                        <li>Obuwie i akcesoria</li>
+                    </ul>
+                </div>
+            </aside>
+        </main>
+        <footer class="footer">
+            <p>&copy; 2026 Weather Fashion Assistant | Inteligentny Bot AI do wyboru odzieży</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
